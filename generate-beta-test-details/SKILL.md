@@ -1,6 +1,6 @@
 ---
 name: generate-beta-test-details
-description: Generate TestFlight beta tester "Test Details" notes for a Notability iOS release. Use when the user says "write beta test details for 16.2", "draft beta notes for PR 51586", "generate test details for <version>", or similar. Finds the release submission PR on GitHub, reads the linked PRs, filters for user-visible changes (especially .beta features wanting feedback), and outputs 3-4 main bullets plus an optional "For new canvas testers" section.
+description: Generate TestFlight "Test Details" notes for a Notability iOS release. Triggers on "beta test details for <version>" or "beta notes for PR <num>".
 ---
 
 # Beta Test Details Generator

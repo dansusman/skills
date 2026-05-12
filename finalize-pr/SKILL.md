@@ -1,5 +1,5 @@
 ---
-description: Run the PR code review loop locally against the current branch — same review the GH action would run on push, but before opening the PR. Present feedback, get user sign-off, apply fixes as commits. Does NOT push or open a PR.
+description: Run the GH-action PR review loop locally against the current branch — feedback, sign-off, fixes as commits. Does NOT push or open a PR.
 argument-hint: "[optional base branch, defaults to staging]"
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: pr-review-slideshow
-description: "Review a GitHub PR and produce an HTML slideshow of manual-verification callouts (no comments posted, no approve/reject). Use when the user says 'review PR <num> and make a slideshow', 'slideshow callouts for <num>', 'generate review callouts for <num>', 'look at <num> and give me callouts', or similar. Two-pass review: initial suggestions, then validate each by tracing code, then output the deck."
+description: "Review a GitHub PR and produce an HTML slideshow of manual-verification callouts. No comments posted, no approve/reject. Triggers on 'slideshow callouts for <num>'."
 ---
 
 # PR Review Slideshow

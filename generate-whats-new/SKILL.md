@@ -1,6 +1,6 @@
 ---
 name: generate-whats-new
-description: Generate Apple App Store "What's New" release notes for a Notability iOS release. Use when the user says "write what's new for 16.2", "write what's new for PR 51586", "draft release notes for <version>", "generate whats new", or similar. Finds the release submission PR on GitHub, reads the linked PRs, filters by feature flag visibility, and outputs ~4 bullets in Notability's App Store voice.
+description: Generate App Store "What's New" notes for a Notability iOS release. Triggers on "what's new for <version>" or "release notes for PR <num>".
 ---
 
 # What's New Generator

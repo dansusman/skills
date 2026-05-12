@@ -1,6 +1,6 @@
 ---
 name: support-callouts
-description: Generate a support-team callout list for a Notability release PR. Use when the user says "support callouts for 16.2", "support notes for PR 51586", "generate support callouts for <version>", "what should support know about this release", or similar. Produces a grouped, plain-language list of user-facing changes (with extra emphasis on Support Requested / Zendesk / user-reported items) plus a separate Tech Debt section for manual review.
+description: Generate support-team callouts for a Notability release PR. Triggers on "support callouts for <version>" or "support notes for PR <num>".
 ---
 
 # Support Callouts Generator
