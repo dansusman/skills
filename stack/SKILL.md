@@ -138,6 +138,43 @@ again.
 Do not edit `.git/stack/state.json` by hand. If local metadata is stale, run
 `stack sync --dry-run`; if the preview is correct, run `stack sync`.
 
+## After A Partial Sync Failure: Verify Remote Refs Before Recommending Pushes
+
+When `stack sync` crashes mid-flight, do not infer what got pushed from
+`stack history` or the error trace. The history block lists the *planned*
+mutation set, not a per-step completion log; the crash can land before, during,
+or after any individual push.
+
+Instead, for each branch in the stack, verify the remote ref directly:
+
+```bash
+git fetch origin
+for b in <root> <child1> <child2> ...; do
+  echo "== $b =="
+  git rev-parse "origin/$b" "$b"
+  git log --oneline "origin/$b..$b" | head
+done
+```
+
+A non-empty `origin/$b..$b` log means that branch has unpushed commits and must
+be pushed before any descendant. Push bottom-up starting from the lowest branch
+that has unpushed commits — not the lowest branch whose local commits *look*
+new.
+
+Common trap: `git push --force-with-lease origin <child>` succeeds even when
+the parent branch's remote ref is stale, because the push uploads the parent's
+commit objects as part of the child's ancestry but does not move the parent's
+remote ref pointer. The child's PR on GitHub then sees its base ref as the old
+parent SHA, and the PR diff balloons to include every commit between the old
+and new parent — mass-pinging reviewers. A successful child push is **not**
+evidence that the parent ref is current; only `git rev-parse origin/<parent>`
+is.
+
+Cleanup debris from a failed sync: a leftover `stack/replay-<timestamp>-<branch>`
+local branch is safe to delete with `git branch -D` once the descendants are
+rebased. `stack undo --apply` restores the pre-sync state if you would rather
+back out entirely than push forward.
+
 ## Merge The Stack Root
 
 ```bash
