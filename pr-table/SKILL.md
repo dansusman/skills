@@ -1,12 +1,12 @@
 ---
 name: pr-table
-description: "Read the review comments on a GitHub PR and output a triage table of each comment, whether to address it now, the justification, and ease of implementation. Triggers on 'pr table for <num>', 'triage pr comments for <num>', or a request to look at PR comments and decide what to address."
+description: "Read the inline review comments on a GitHub PR and output a triage table of each comment, whether to address it now, the justification, and ease of implementation. Triggers on 'pr table for <num>', 'triage pr comments for <num>', or a request to look at PR comments and decide what to address."
 argument-hint: <pr-number>
 ---
 
 # Triage PR Comments
 
-Given a PR number, fetch its review comments and produce a single table the human can use to decide what to act on.
+Given a PR number, fetch its inline review comments and produce a single table the human can use to decide what to act on.
 
 ## Inputs
 
@@ -28,12 +28,10 @@ REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)   # or the repo the 
 
 gh pr view <num> --repo "$REPO" --json title,body,author,url
 gh pr diff <num> --repo "$REPO"
-# Inline review comments (line-level, the main source)
+# Inline review comments (line-level) — the ONLY comment source for the table.
+# Do not fetch or triage top-level review bodies or issue-style conversation
+# comments; the table covers inline threads exclusively.
 gh api "repos/$REPO/pulls/<num>/comments" --paginate
-# Top-level review summaries
-gh api "repos/$REPO/pulls/<num>/reviews" --paginate
-# Issue-style conversation comments
-gh api "repos/$REPO/issues/<num>/comments" --paginate
 # Thread RESOLUTION state — the REST /comments endpoint does NOT expose whether a
 # thread is resolved/outdated. Always pull this too and key the table off it.
 # owner/name come from $REPO (split on the slash).
@@ -59,7 +57,7 @@ Read the diff so you can judge each comment against the actual code, not just it
 
 ### 2. Build the table
 
-One row per substantive **unresolved** comment. Skip pure chatter (e.g. "LGTM", emoji-only, bot noise) — note in a line below the table how many you dropped and why.
+One row per substantive **unresolved** inline comment. Skip pure chatter (e.g. "LGTM", emoji-only, bot noise) — note in a line below the table how many you dropped and why.
 
 Put **resolved** threads in a separate "Already resolved — no action" list below the table, each with a one-clause disposition (fixed in commit X / declined by author / deferred). Don't give them table rows — they're not decisions the human still has to make.
 
