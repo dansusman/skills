@@ -12,7 +12,6 @@ Write the commit message directly using the rules below. No external scripts or 
 ```bash
 git diff --cached            # if empty, ask before staging anything
 git branch --show-current
-git log --oneline -10 --format="%s"   # match existing style in this repo
 ```
 
 Only pull GitHub context (`gh issue list`, `gh pr list`) when the diff or branch name plausibly relates to an issue/PR (e.g. branch named after an issue number). Skip otherwise.
