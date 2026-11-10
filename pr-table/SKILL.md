@@ -63,19 +63,21 @@ Put **resolved** threads in a separate "Already resolved — no action" list bel
 
 For each comment, fill the columns:
 
-- **Comment** — short paraphrase of the ask, with the file:line and commenter. Keep it to one line.
+- **File** — `file:line` of the thread's root comment (basename is fine when unambiguous).
+- **Commenter** — GitHub login(s) of whoever made the ask, as written (never guess real names). For a thread with replies, list the root commenter first.
+- **Comment** — short paraphrase of the ask. Keep it to one line; file and commenter live in their own columns.
 - **Address now or not** — `Now` or `Later` (use `Later` for follow-up tickets, nits the author can defer, or out-of-scope ideas).
 - **Justification** — one clause on *why* that call: blocks correctness/ship → Now; cosmetic, speculative, or separate concern → Later.
 - **Ease of implementation** — `Trivial` / `Moderate` / `Involved`, judged from the diff and surrounding code.
 
-Order rows `Now` first (hardest first within that group), then `Later`.
+One row per thread, never merged across threads, so each row maps to one GitHub thread. Order rows the way GitHub's Conversation tab does: by the thread root comment's `created_at`, oldest first, most recent last. Use the same order for the resolved list.
 
 ### 3. Output
 
 Render as a Markdown table:
 
-| Comment | Address now or not | Justification | Ease of implementation |
-|---|---|---|---|
+| File | Commenter | Comment | Address now or not | Justification | Ease of implementation |
+|---|---|---|---|---|---|
 
 Do **not** post anything to the PR, reply to comments, or push changes — the table is for the human to act on. If the user then asks you to address a row, that's a separate request.
 
