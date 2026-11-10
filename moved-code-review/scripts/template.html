@@ -1,0 +1,306 @@
+<title>__TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: single centered review column, GitHub-style file cards, moved runs folded by default */
+:root {
+  --bg: #f6f8fa; --surface: #ffffff; --fg: #1f2328; --muted: #59636e; --border: #d1d9e0;
+  --accent: #0969da;
+  --add-bg: #dafbe1; --add-gutter: #aceebb; --add-fg: #1a7f37;
+  --del-bg: #ffebe9; --del-gutter: #ffcecb; --del-fg: #cf222e;
+  --mv-bg: #f3f0fb; --mv-bg-alt: #ebe6f7; --mv-gutter: #ddd5f3; --mv-fg: #6e5bb5; --mv-text: #6e7781;
+  --hunk-bg: #ddf4ff; --fold-bg: #f6f3fd;
+  --sans: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d1117; --surface: #151b23; --fg: #e6edf3; --muted: #9198a1; --border: #3d444d;
+  --accent: #4493f8;
+  --add-bg: #12261e; --add-gutter: #1f4a33; --add-fg: #3fb950;
+  --del-bg: #2d1416; --del-gutter: #5a1e22; --del-fg: #f85149;
+  --mv-bg: #1b1830; --mv-bg-alt: #221e3b; --mv-gutter: #2f2950; --mv-fg: #a99cf0; --mv-text: #7d8590;
+  --hunk-bg: #121d2f; --fold-bg: #1a1730; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0d1117; --surface: #151b23; --fg: #e6edf3; --muted: #9198a1; --border: #3d444d;
+  --accent: #4493f8;
+  --add-bg: #12261e; --add-gutter: #1f4a33; --add-fg: #3fb950;
+  --del-bg: #2d1416; --del-gutter: #5a1e22; --del-fg: #f85149;
+  --mv-bg: #1b1830; --mv-bg-alt: #221e3b; --mv-gutter: #2f2950; --mv-fg: #a99cf0; --mv-text: #7d8590;
+  --hunk-bg: #121d2f; --fold-bg: #1a1730; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1280px; margin: 0 auto; padding-block: 24px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 16px; }
+h1 { font-size: 22px; font-weight: 600; margin: 0; text-wrap: balance; }
+.byline { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.byline a { color: var(--accent); }
+.byline code { font-family: var(--mono); font-size: 12px; }
+.msg { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; white-space: pre-wrap; font-size: 13px; color: var(--muted); max-width: 72ch; margin: 0; font-family: var(--sans); }
+
+.toolbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 8px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 2px; border: 1px solid var(--border); }
+.sw.add { background: var(--add-gutter); } .sw.del { background: var(--del-gutter); } .sw.mv { background: var(--mv-gutter); }
+.spacer { flex: 1; }
+button { font: inherit; font-size: 12px; font-weight: 500; color: var(--fg); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, .fold:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+
+.summary { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow-x: auto; }
+.summary table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.summary th, .summary td { padding: 6px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.summary tr:last-child td { border-bottom: 0; }
+.summary th { font-weight: 600; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+.summary td.num { text-align: right; font-family: var(--mono); font-size: 12px; }
+.summary th.num { text-align: right; }
+.summary a { color: var(--accent); text-decoration: none; font-family: var(--mono); font-size: 12px; }
+.summary a:hover { text-decoration: underline; }
+.n-add { color: var(--add-fg); } .n-del { color: var(--del-fg); } .n-mv { color: var(--mv-fg); }
+
+.badge { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); text-transform: lowercase; }
+.badge.deleted { color: var(--del-fg); border-color: var(--del-gutter); }
+.badge.added { color: var(--add-fg); border-color: var(--add-gutter); }
+.badge.renamed { color: var(--mv-fg); border-color: var(--mv-gutter); }
+
+.file { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; min-width: 0; scroll-margin-top: 64px; }
+.fhead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 8px 12px; border-bottom: 1px solid var(--border); position: sticky; top: calc(env(safe-area-inset-top, 0px) + 45px); background: var(--surface); z-index: 3; border-radius: 6px 6px 0 0; }
+.fhead .path { font-family: var(--mono); font-size: 12px; font-weight: 600; word-break: break-all; min-width: 0; }
+.fhead .from { font-family: var(--mono); font-size: 11px; color: var(--muted); word-break: break-all; width: 100%; }
+.fhead .stats { margin-left: auto; font-family: var(--mono); font-size: 12px; display: flex; gap: 10px; }
+.fhead .chev { background: none; border: 0; padding: 0 4px; color: var(--muted); }
+.file.collapsed .body { display: none; }
+.body { overflow-x: auto; }
+
+table.diff { border-collapse: collapse; font-family: var(--mono); font-size: 12px; line-height: 20px; width: 100%; min-width: max-content; }
+table.diff td { padding: 0 8px; vertical-align: top; }
+td.ln { width: 1%; min-width: 40px; text-align: right; color: var(--muted); user-select: none; font-variant-numeric: tabular-nums; }
+td.sg { width: 1%; padding: 0 4px; user-select: none; text-align: center; }
+td.code { white-space: pre; }
+tr.add td { background: var(--add-bg); } tr.add td.ln { background: var(--add-gutter); }
+tr.del td { background: var(--del-bg); } tr.del td.ln { background: var(--del-gutter); }
+tr.add td.sg { color: var(--add-fg); } tr.del td.sg { color: var(--del-fg); }
+tr.mv td { background: var(--mv-bg); color: var(--mv-text); } tr.mv.z1 td { background: var(--mv-bg-alt); }
+tr.mv td.ln { background: var(--mv-gutter); }
+tr.mv td.sg { color: var(--mv-fg); }
+tr.mv.edge td.code { box-shadow: inset 3px 0 0 var(--mv-fg); color: var(--fg); }
+tr.hunk td { background: var(--hunk-bg); color: var(--muted); }
+tr.fold td { background: var(--fold-bg); color: var(--mv-fg); font-family: var(--sans); font-size: 12px; cursor: pointer; padding-block: 2px; }
+tr.fold td { white-space: normal; }
+tr.fold:hover .flabel { text-decoration: underline; }
+.flabel { font-weight: 600; margin-right: 12px; }
+.dests { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.dests .arrow { color: var(--muted); }
+a.dest { font-family: var(--mono); font-size: 11px; color: var(--accent); text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 0 6px; }
+a.dest:hover { border-color: var(--accent); }
+a.dest:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.nomatch { color: var(--muted); font-style: italic; }
+@keyframes flash { from { box-shadow: inset 0 0 0 9999px color-mix(in srgb, var(--accent) 35%, transparent); } to { box-shadow: none; } }
+tr.flash td { animation: flash 1.6s ease-out; }
+@media (prefers-reduced-motion: reduce) { tr.flash td { animation: none; outline: 1px solid var(--accent); } }
+.empty { padding: 12px; color: var(--muted); font-size: 13px; }
+@media (max-width: 600px) { .fhead { position: static; } }
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:6px">
+    <h1 id="subject"></h1>
+    <div class="byline"><code id="ref"></code><a id="url" hidden></a><span id="author"></span><span id="date"></span></div>
+  </header>
+  <pre class="msg" id="body"></pre>
+
+  <div class="toolbar">
+    <div class="legend">
+      <span><i class="sw del"></i>Removed, not moved</span>
+      <span><i class="sw add"></i>Added, not moved</span>
+      <span><i class="sw mv"></i>Moved unchanged (alternating shade = separate blocks)</span>
+    </div>
+    <div class="spacer"></div>
+    <button id="foldBtn" aria-pressed="true">Fold moved lines</button>
+    <button id="expandAll">Expand files</button>
+    <button id="collapseAll">Collapse files</button>
+  </div>
+
+  <div class="summary"><table>
+    <thead><tr><th>File</th><th>Status</th><th class="num">Real −</th><th class="num">Real +</th><th class="num">Moved</th></tr></thead>
+    <tbody id="sumBody"></tbody>
+  </table></div>
+
+  <div id="files" style="display:flex;flex-direction:column;gap:16px"></div>
+</div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+const data = JSON.parse(document.getElementById('data').textContent);
+const $ = (id) => document.getElementById(id);
+const m = data.meta;
+$('subject').textContent = m.subject;
+$('ref').textContent = m.ref;
+if (m.url) { $('url').href = m.url; $('url').textContent = 'View on GitHub'; $('url').hidden = false; }
+$('author').textContent = m.author;
+$('date').textContent = m.date;
+$('body').textContent = m.body;
+$('body').hidden = !m.body;
+
+let foldMoved = true;
+try { foldMoved = localStorage.getItem('foldMoved') !== '0'; } catch (e) {}
+
+const isMoved = (k) => k[0] === 'm';
+function counts(f) {
+  const c = { add: 0, del: 0, mv: 0 };
+  for (const h of f.hunks) for (const [k] of h.lines) {
+    if (k === 'add') c.add++; else if (k === 'del') c.del++; else if (isMoved(k)) c.mv++;
+  }
+  return c;
+}
+const short = (p) => p.split('/').pop();
+const anchor = (i) => 'file-' + i;
+
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+const rowId = (fi, side, num) => `f${fi}-${side}${num}`;
+const revealers = new Map();
+
+function row(cls, o, n, sign, code) {
+  const tr = el('tr', cls);
+  tr.append(el('td', 'ln', o ?? ''), el('td', 'ln', n ?? ''), el('td', 'sg', sign), el('td', 'code', code));
+  return tr;
+}
+
+function segments(lines) {
+  const segs = [];
+  for (const [, , , , t] of lines) {
+    const last = segs[segs.length - 1];
+    if (!t) { if (last && last.missing) last.count++; else segs.push({ missing: true, count: 1 }); continue; }
+    const [f, side, num] = t;
+    if (last && !last.missing && last.f === f && last.side === side && last.end + 1 === num) last.end = num;
+    else segs.push({ f, side, start: num, end: num });
+  }
+  return segs;
+}
+
+function destLink(s) {
+  const f = data.files[s.f];
+  const name = short(s.side === 'o' ? f.old : f.new);
+  const range = s.start === s.end ? `L${s.start}` : `L${s.start}–${s.end}`;
+  const a = el('a', 'dest', `${name} ${range}`);
+  a.href = '#' + rowId(s.f, s.side, s.start);
+  a.title = (s.side === 'o' ? 'Old ' : 'New ') + (s.side === 'o' ? f.old : f.new);
+  a.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); reveal(s); });
+  return a;
+}
+
+function reveal(s) {
+  const card = $(anchor(s.f));
+  if (card.classList.contains('collapsed')) card.querySelector('.chev').click();
+  const ids = [];
+  for (let x = s.start; x <= s.end; x++) ids.push(rowId(s.f, s.side, x));
+  ids.forEach((id) => revealers.get(id)?.());
+  const rows = ids.map((id) => $(id)).filter(Boolean);
+  if (!rows.length) return;
+  rows[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  rows.forEach((r) => { r.classList.remove('flash'); void r.offsetWidth; r.classList.add('flash'); });
+}
+
+function renderHunk(tbody, h, fi) {
+  tbody.append(row('hunk', null, null, '', `@@ -${h.o} +${h.n} @@ ${h.ctx}`));
+  let i = 0;
+  while (i < h.lines.length) {
+    if (!isMoved(h.lines[i][0])) { tbody.append(lineRow(h.lines[i], fi)); i++; continue; }
+    let j = i;
+    while (j < h.lines.length && isMoved(h.lines[j][0])) j++;
+    const run = h.lines.slice(i, j);
+    const out = run[0][0].includes('del');
+    const fold = el('tr', 'fold');
+    const td = el('td'); td.colSpan = 4; fold.append(td);
+    fold.tabIndex = 0; fold.setAttribute('role', 'button');
+    const label = el('span', 'flabel');
+    const dests = el('span', 'dests');
+    dests.append(el('span', 'arrow', out ? 'moved to' : 'moved from'));
+    segments(run).forEach((s) => dests.append(s.missing ? el('span', 'nomatch', `${s.count} unpaired`) : destLink(s)));
+    td.append(label, dests);
+    let rows = null;
+    const setOpen = (open) => {
+      if (open && !rows) {
+        rows = run.map((ln) => lineRow(ln, fi));
+        fold.after(...rows);
+      } else if (!open && rows) {
+        rows.forEach((r) => r.remove()); rows = null;
+      }
+      label.textContent = `${open ? '▾' : '▸'} ${run.length} moved line${run.length === 1 ? '' : 's'} unchanged`;
+      fold.setAttribute('aria-expanded', String(open));
+    };
+    for (const ln of run) revealers.set(lineIdFor(ln, fi), () => setOpen(true));
+    fold.addEventListener('click', () => setOpen(!rows));
+    fold.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(!rows); } });
+    tbody.append(fold);
+    setOpen(!foldMoved);
+    i = j;
+  }
+}
+
+function lineIdFor([k, , , [o, n]], fi) {
+  return k.includes('del') ? rowId(fi, 'o', o) : rowId(fi, 'n', n);
+}
+
+function lineRow(ln, fi) {
+  const [k, z, code, [o, n]] = ln;
+  let tr;
+  if (k === 'ctx') tr = row('ctx', o, n, ' ', code);
+  else if (k === 'add') tr = row('add', null, n, '+', code);
+  else if (k === 'del') tr = row('del', o, null, '−', code);
+  else {
+    const cls = 'mv z' + z + (k.endsWith('b') ? ' edge' : '');
+    tr = k.includes('del') ? row(cls, o, null, '−', code) : row(cls, null, n, '+', code);
+  }
+  if (k !== 'ctx') tr.id = lineIdFor(ln, fi);
+  return tr;
+}
+
+function renderFile(f, i) {
+  const c = counts(f);
+  const card = el('section', 'file'); card.id = anchor(i);
+  const head = el('div', 'fhead');
+  const chev = el('button', 'chev', '▾'); chev.setAttribute('aria-label', 'Toggle file');
+  chev.addEventListener('click', () => { card.classList.toggle('collapsed'); chev.textContent = card.classList.contains('collapsed') ? '▸' : '▾'; });
+  head.append(chev, el('span', 'path', f.status === 'deleted' ? f.old : f.new), el('span', 'badge ' + f.status, f.status + (f.similarity ? ' ' + f.similarity : '')));
+  const stats = el('span', 'stats');
+  stats.append(el('span', 'n-del', '−' + c.del), el('span', 'n-add', '+' + c.add), el('span', 'n-mv', '⇅' + c.mv));
+  head.append(stats);
+  if (f.status === 'renamed') head.append(el('span', 'from', 'from ' + f.old));
+  card.append(head);
+  const body = el('div', 'body');
+  const table = el('table', 'diff'); const tbody = el('tbody');
+  f.hunks.forEach((h) => renderHunk(tbody, h, i));
+  table.append(tbody); body.append(table); card.append(body);
+  return card;
+}
+
+function render() {
+  const files = $('files'); files.textContent = ''; revealers.clear();
+  data.files.forEach((f, i) => files.append(renderFile(f, i)));
+  $('foldBtn').setAttribute('aria-pressed', String(foldMoved));
+}
+
+const sb = $('sumBody');
+data.files.forEach((f, i) => {
+  const c = counts(f); const tr = el('tr');
+  const a = el('a', null, short(f.status === 'deleted' ? f.old : f.new)); a.href = '#' + anchor(i);
+  a.addEventListener('click', (e) => { e.preventDefault(); $(anchor(i)).scrollIntoView({ behavior: 'smooth' }); });
+  const td = el('td'); td.append(a);
+  const st = el('td'); st.append(el('span', 'badge ' + f.status, f.status + (f.similarity ? ' ' + f.similarity : '')));
+  tr.append(td, st, el('td', 'num n-del', c.del), el('td', 'num n-add', c.add), el('td', 'num n-mv', c.mv));
+  sb.append(tr);
+});
+
+$('foldBtn').addEventListener('click', () => {
+  foldMoved = !foldMoved;
+  try { localStorage.setItem('foldMoved', foldMoved ? '1' : '0'); } catch (e) {}
+  render();
+});
+$('expandAll').addEventListener('click', () => document.querySelectorAll('.file').forEach((f) => { f.classList.remove('collapsed'); f.querySelector('.chev').textContent = '▾'; }));
+$('collapseAll').addEventListener('click', () => document.querySelectorAll('.file').forEach((f) => { f.classList.add('collapsed'); f.querySelector('.chev').textContent = '▸'; }));
+render();
+</script>
